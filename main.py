@@ -99,12 +99,12 @@ class MeuAplicativo(App):
                 for vaga in vagas_permitidas:
                     carros = buscar_carro_por_vaga(conexao, vaga)
                     if carros:
-                        for carro, placa, responsavel, horario_entrada, horario_saida, dia_semana in carros:
+                        for id, carro, placa, responsavel, horario_entrada, horario_saida, dia_semana in carros:
                             if self.permissao == "editar":
-                                self.adicionar_linha_edicao(main_box, vaga, carro, placa, responsavel,
+                                self.adicionar_linha_edicao(id, main_box, vaga, carro, placa, responsavel,
                                                             horario_entrada, horario_saida, dia_semana)
                             else:
-                                self.adicionar_linha_visualizacao(main_box, vaga, carro, placa, responsavel,
+                                self.adicionar_linha_visualizacao(id, main_box, vaga, carro, placa, responsavel,
                                                                   horario_entrada, horario_saida, dia_semana)
         finally:
             conexao.close()
@@ -145,7 +145,7 @@ class MeuAplicativo(App):
 
         main_box.add_widget(linha)
 
-    def adicionar_linha_edicao(self, main_box, vaga, carro, placa, responsavel, horario_entrada, horario_saida,
+    def adicionar_linha_edicao(self, id,  main_box, vaga, carro, placa, responsavel, horario_entrada, horario_saida,
                                dia_semana):
         """Adiciona uma linha editável."""
         self.editando = True  # Pausa atualização
@@ -169,6 +169,7 @@ class MeuAplicativo(App):
         salvar_btn = Button(text="Salvar", size_hint_x=0.2)
         salvar_btn.bind(
             on_release=lambda btn: self.salvar_dados(
+                id,
                 vaga,
                 campos["carro"].text,
                 campos["placa"].text,
@@ -188,7 +189,7 @@ class MeuAplicativo(App):
         self.editando = False
         print("Edição concluída. Atualização retomada.")
 
-    def salvar_dados(self, vaga, carro, placa, responsavel, entrada, saida, dia):
+    def salvar_dados(self, id,  vaga, carro, placa, responsavel, entrada, saida, dia):
         """Salva os dados modificados no banco."""
         if not self.validar_horario(entrada) or not self.validar_horario(saida):
             print("Erro: Horário inválido.")
@@ -201,9 +202,9 @@ class MeuAplicativo(App):
                 query = """
                 UPDATE carros
                 SET carro = %s, placa = %s, responsavel = %s, horario_entrada = %s, horario_saida = %s, dia_semana = %s
-                WHERE vaga = %s
+                WHERE id = %s
                 """
-                cursor.execute(query, (carro, placa, responsavel, entrada, saida, dia, vaga))
+                cursor.execute(query, (carro, placa, responsavel, entrada, saida, dia, id))
                 conexao.commit()
                 print(f"Dados da vaga {vaga} atualizados com sucesso!")
             finally:

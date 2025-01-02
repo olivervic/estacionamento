@@ -28,7 +28,7 @@ def buscar_carro_por_vaga(conexao, vaga):
     try:
         cursor = conexao.cursor()
         query = """
-        SELECT carro, placa, responsavel, horario_entrada, horario_saida, dia_semana
+        SELECT id, carro, placa, responsavel, horario_entrada, horario_saida, dia_semana
         FROM carros
         WHERE vaga = %s
         """
